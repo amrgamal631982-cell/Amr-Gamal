@@ -1,0 +1,6 @@
+{
+  "name": "ملك التخمين",
+  "description": "لعبة تجمعات وحماس تعتمد على تخمين الكلمات بوضع الهاتف على الرأس ومستشعرات الحركة.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
