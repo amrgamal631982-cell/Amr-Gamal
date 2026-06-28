@@ -735,7 +735,7 @@ fun RoundReadyView(viewModel: GameViewModel) {
 @Composable
 fun GameplayView(viewModel: GameViewModel) {
     val currentWord by viewModel.currentWord.collectAsState()
-    val timerSeconds by viewModel.timerSeconds.collectAsState()
+    val currentWordIndex by viewModel.currentWordIndex.collectAsState()
     val score by viewModel.currentRoundScore.collectAsState()
     val feedbackState by viewModel.feedbackState.collectAsState()
     val players by viewModel.players.collectAsState()
@@ -778,15 +778,15 @@ fun GameplayView(viewModel: GameViewModel) {
                 }
             }
 
-            // Central Pulsing Timer
-            val isUrgent = timerSeconds <= 10
+            // Central Pulsing Word Counter
+            val isFinalWord = currentWordIndex == 10
             val infiniteTransition = rememberInfiniteTransition()
-            val timerScale by if (isUrgent) {
+            val timerScale by if (isFinalWord) {
                 infiniteTransition.animateFloat(
                     initialValue = 1.0f,
-                    targetValue = 1.25f,
+                    targetValue = 1.2f,
                     animationSpec = infiniteRepeatable(
-                        animation = tween(400, easing = LinearEasing),
+                        animation = tween(600, easing = LinearEasing),
                         repeatMode = RepeatMode.Reverse
                     )
                 )
@@ -798,12 +798,12 @@ fun GameplayView(viewModel: GameViewModel) {
                 modifier = Modifier
                     .scale(timerScale)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(if (isUrgent) Color(0xFFEF5350) else Color(0xFFF5AF19))
+                    .background(if (isFinalWord) Color(0xFFEF5350) else Color(0xFFF5AF19))
                     .padding(horizontal = 20.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "⏱️ $timerSeconds ثانية",
+                    text = "📝 الكلمة: $currentWordIndex / 10",
                     color = Color(0xFF0F172A),
                     fontWeight = FontWeight.Black,
                     fontSize = 18.sp,
@@ -1012,7 +1012,7 @@ fun RoundSummaryView(viewModel: GameViewModel) {
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "تفاصيل الإجابات خلال الـ 60 ثانية:",
+                    text = "تفاصيل إجابات الـ 10 كلمات:",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -1249,7 +1249,7 @@ fun HowToPlayDialog(onDismiss: () -> Unit) {
                     InstructionRow(step = "3", text = "سيقوم أصدقاؤك بتمثيل الكلمة أو شرحها لك دون نطق اسمها الحقيقي.")
                     InstructionRow(step = "4", text = "إذا عرفت الكلمة وتخمينها صحيح، أمل الشاشة لأسفل (Tilt Down) أو اضغط على الزر الأخضر لحساب نقطة.")
                     InstructionRow(step = "5", text = "إذا صعبت عليك الكلمة وتريد تخطيها، أمل الشاشة لأعلى (Tilt Up) أو اضغط على الزر الأحمر.")
-                    InstructionRow(step = "6", text = "جولة كل لاعب تستمر لمدة 60 ثانية، مع تنبيه تكتكة في آخر 10 ثوانٍ!")
+                    InstructionRow(step = "6", text = "لكل لاعب 10 جولات (10 كلمات)، وتخمين واحد فقط لكل كلمة (إما صحيحة أو تخطي) وبدون حد زمني للوقت!")
                 }
 
                 Divider(color = Color(0xFF334155))

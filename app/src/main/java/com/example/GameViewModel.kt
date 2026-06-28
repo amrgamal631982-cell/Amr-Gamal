@@ -39,8 +39,8 @@ class GameViewModel : ViewModel() {
     private val _currentWord = MutableStateFlow("")
     val currentWord: StateFlow<String> = _currentWord.asStateFlow()
 
-    private val _timerSeconds = MutableStateFlow(60)
-    val timerSeconds: StateFlow<Int> = _timerSeconds.asStateFlow()
+    private val _currentWordIndex = MutableStateFlow(1)
+    val currentWordIndex: StateFlow<Int> = _currentWordIndex.asStateFlow()
 
     private val _currentRoundAnswers = MutableStateFlow<List<WordResult>>(emptyList())
     val currentRoundAnswers: StateFlow<List<WordResult>> = _currentRoundAnswers.asStateFlow()
@@ -166,7 +166,7 @@ class GameViewModel : ViewModel() {
         
         _currentRoundAnswers.value = emptyList()
         _currentRoundScore.value = 0
-        _timerSeconds.value = 60
+        _currentWordIndex.value = 1
         _feedbackState.value = null
         isActionCooldown = false
 
@@ -177,23 +177,6 @@ class GameViewModel : ViewModel() {
         }
 
         _gameStage.value = GameStage.GAMEPLAY
-        startTimer()
-    }
-
-    private fun startTimer() {
-        timerJob?.cancel()
-        timerJob = viewModelScope.launch {
-            while (_timerSeconds.value > 0) {
-                delay(1000)
-                _timerSeconds.value -= 1
-                
-                // Play clock ticking in the last 10 seconds
-                if (_timerSeconds.value <= 10 && _timerSeconds.value > 0) {
-                    playTickSound()
-                }
-            }
-            endRound()
-        }
     }
 
     fun recordCorrect() {
@@ -213,7 +196,12 @@ class GameViewModel : ViewModel() {
             _feedbackState.value = null
             
             // Next word
-            nextWord()
+            if (_currentWordIndex.value >= 10) {
+                endRound()
+            } else {
+                _currentWordIndex.value += 1
+                nextWord()
+            }
             isActionCooldown = false
         }
     }
@@ -234,7 +222,12 @@ class GameViewModel : ViewModel() {
             _feedbackState.value = null
             
             // Next word
-            nextWord()
+            if (_currentWordIndex.value >= 10) {
+                endRound()
+            } else {
+                _currentWordIndex.value += 1
+                nextWord()
+            }
             isActionCooldown = false
         }
     }
@@ -257,7 +250,6 @@ class GameViewModel : ViewModel() {
     }
 
     private fun endRound() {
-        timerJob?.cancel()
         _feedbackState.value = null
         
         // Save score to player
